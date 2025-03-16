@@ -9,11 +9,21 @@
         body {
             text-align: center;
             font-family: Arial, sans-serif;
-            background-color: #1e1e1e;
+            background: linear-gradient(135deg, #8e44ad, #3498db);
             color: white;
+            height: 100vh;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
         .container {
-            margin-top: 50px;
+            background: rgba(0, 0, 0, 0.7);
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+            width: 90%;
+            max-width: 400px;
         }
         .button {
             background-color: #f39c12;
@@ -24,21 +34,30 @@
             border-radius: 10px;
             cursor: pointer;
             margin-top: 20px;
+            transition: transform 0.1s ease, box-shadow 0.1s ease;
+        }
+        .button:active {
+            transform: scale(0.95);
+            box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.2);
         }
         .shop {
             margin-top: 30px;
         }
         .shop button {
             display: block;
-            width: 200px;
-            margin: 10px auto;
-            padding: 10px;
+            width: 100%;
+            padding: 12px;
             font-size: 18px;
             background-color: #3498db;
             color: white;
             border: none;
             border-radius: 5px;
             cursor: pointer;
+            transition: transform 0.1s ease, box-shadow 0.1s ease;
+        }
+        .shop button:active {
+            transform: scale(0.95);
+            box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.2);
         }
         .invite-button {
             background-color: #2ecc71;
@@ -49,11 +68,13 @@
             border-radius: 5px;
             cursor: pointer;
             display: block;
-            width: 200px;
+            width: 100%;
             margin: 20px auto;
+            transition: transform 0.1s ease, box-shadow 0.1s ease;
         }
         .invite-button:active {
-            background-color: #27ae60;
+            transform: scale(0.95);
+            box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.2);
         }
     </style>
 </head>
@@ -73,19 +94,17 @@
     </div>
     
     <script>
-        let balance = localStorage.getItem("balance") ? parseInt(localStorage.getItem("balance")) : 0;
+        let balance = parseInt(localStorage.getItem("balance")) || 0;
         let clickValue = 1;
         let autoMining = false;
         let tg = window.Telegram.WebApp;
         tg.expand();
 
-        // Функция добычи монет
         function mineCoin() {
             balance += clickValue;
             updateUI();
         }
 
-        // Функция покупки улучшений
         function buyUpgrade(type, cost) {
             if (balance >= cost) {
                 balance -= cost;
@@ -104,13 +123,11 @@
             }
         }
 
-        // Функция обновления интерфейса
         function updateUI() {
             document.getElementById("balance").innerText = balance;
             localStorage.setItem("balance", balance);
         }
 
-        // Функция приглашения друга
         function inviteFriend() {
             let userId = tg.initDataUnsafe.user?.id;
             if (!userId) {
@@ -119,44 +136,33 @@
             }
 
             let referralLink = `https://t.me/CryptoClicker1_bot?start=${userId}`;
-
-            tg.showPopup({
-                message: "Приглашение друга",
-                buttons: [
-                    { id: "copy", type: "default", text: "📋 Скопировать ссылку" },
-                    { id: "share", type: "ok", text: "📤 Поделиться" },
-                    { id: "close", type: "cancel", text: "❌ Закрыть" }
-                ]
-            }, (buttonId) => {
-                if (buttonId === "copy") {
-                    navigator.clipboard.writeText(referralLink).then(() => {
-                        tg.showPopup({ message: "Ссылка скопирована!" });
-                    }).catch(() => {
-                        tg.showPopup({ message: "Ошибка копирования ссылки!" });
-                    });
-                } else if (buttonId === "share") {
-                    tg.openTelegramLink(referralLink);
-                }
+            navigator.clipboard.writeText(referralLink).then(() => {
+                tg.showPopup({ message: "Ссылка скопирована! Отправьте её другу." });
+            }).catch(() => {
+                tg.showPopup({ message: "Ошибка копирования ссылки!" });
             });
         }
 
-        // Проверка реферальной ссылки и выдача бонуса
         function checkReferral() {
             let urlParams = new URLSearchParams(window.location.search);
             let referrerId = urlParams.get("start");
 
             if (referrerId && !localStorage.getItem("referrer")) {
-                balance += 25; // Бонус новому игроку
+                balance += 25;
                 localStorage.setItem("referrer", referrerId);
-                tg.showPopup({ message: "🎉 Вы получили 25 монет за регистрацию по приглашению!" });
+                tg.showPopup({ message: "🎉 Вы получили 25 монет за приглашение!" });
                 updateUI();
-
-                // Отправка сообщения пригласителю (ЭТО НУЖНО ДЕЛАТЬ ЧЕРЕЗ СЕРВЕР!)
-                tg.showPopup({ message: `⚠️ ВНИМАНИЕ: Начислить 50 монет пригласителю (${referrerId}) можно только через сервер!` });
+                
+                fetch(`https://yourserver.com/api/refer?referrer=${referrerId}`, {
+                    method: "POST"
+                }).then(() => {
+                    console.log("Монеты отправлены пригласителю!");
+                }).catch(() => {
+                    console.log("Ошибка отправки данных!");
+                });
             }
         }
 
-        // Загружаем баланс при старте
         updateUI();
         checkReferral();
     </script>
