@@ -6,10 +6,11 @@
     <title>Crypto Clicker</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@700&display=swap');
         body {
             text-align: center;
-            font-family: Arial, sans-serif;
-            background-color: #1e1e1e;
+            font-family: 'Roboto', sans-serif;
+            background: linear-gradient(135deg, #1e1e1e, #3a3a3a);
             color: white;
         }
         .container {
@@ -24,6 +25,12 @@
             border-radius: 10px;
             cursor: pointer;
             margin-top: 20px;
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2);
+            transition: transform 0.1s, box-shadow 0.1s;
+        }
+        .button:active {
+            transform: scale(0.95);
+            box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.3);
         }
         .shop {
             margin-top: 30px;
@@ -39,6 +46,12 @@
             border: none;
             border-radius: 5px;
             cursor: pointer;
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2);
+            transition: transform 0.1s, box-shadow 0.1s;
+        }
+        .shop button:active {
+            transform: scale(0.95);
+            box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.3);
         }
     </style>
 </head>
