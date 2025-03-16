@@ -109,49 +109,43 @@
         .close-btn:hover {
             background: darkred;
         }
-        .error-message {
-            position: fixed;
-            top: 10px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: rgba(255, 0, 0, 0.8);
-            color: white;
-            padding: 10px 20px;
-            border-radius: 5px;
-            display: none;
-            opacity: 0;
-            transition: opacity 0.5s ease-in-out;
-        }
-        .nickname-container {
+        .nickname-popup {
             position: fixed;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            background: linear-gradient(135deg, #6a11cb, #2575fc);
+            background: linear-gradient(135deg, #ff9a9e, #fad0c4);
             padding: 20px;
             border-radius: 10px;
+            box-shadow: 0px 0px 10px rgba(0,0,0,0.2);
             text-align: center;
-            box-shadow: 0px 0px 10px rgba(0,0,0,0.3);
-            display: none;
         }
-        .nickname-container input {
+        .nickname-popup input {
             padding: 10px;
+            font-size: 16px;
+            margin: 10px;
             border: none;
             border-radius: 5px;
-            width: 80%;
-            margin-bottom: 10px;
         }
-        .nickname-container button {
-            padding: 10px 15px;
+        .nickname-popup button {
+            padding: 10px;
+            font-size: 16px;
+            background: #4CAF50;
+            color: white;
             border: none;
             border-radius: 5px;
-            background: #f39c12;
-            color: white;
             cursor: pointer;
         }
     </style>
 </head>
 <body>
+    <div id="nickname-popup" class="nickname-popup">
+        <h2>Введите никнейм</h2>
+        <input type="text" id="nickname-input" placeholder="Ваш ник">
+        <button onclick="generateNickname()">🎲</button>
+        <button onclick="saveNickname()">OK</button>
+    </div>
+
     <div class="container">
         <h1>Crypto Clicker</h1>
         <p>Баланс: <span id="balance">0</span> монет</p>
@@ -171,34 +165,11 @@
         <ul class="leaderboard-list" id="leaderboard-list"></ul>
     </div>
 
-    <div class="error-message" id="error-message">Недостаточно монет!</div>
-
-    <div class="nickname-container" id="nickname-container">
-        <h2>Введите ник</h2>
-        <input type="text" id="nickname-input" placeholder="Ваш ник">
-        <button onclick="setNickname()">OK</button>
-    </div>
-
     <script>
         let balance = 0;
         let clickValue = 1;
         let autoMining = false;
-        let nickname = localStorage.getItem("nickname") || null;
-        let tg = window.Telegram.WebApp;
-        tg.expand();
-
-        if (!nickname) {
-            document.getElementById("nickname-container").style.display = "block";
-        }
-
-        function setNickname() {
-            let input = document.getElementById("nickname-input").value.trim();
-            if (input && input.indexOf(" ") === -1) {
-                nickname = input;
-                localStorage.setItem("nickname", nickname);
-                document.getElementById("nickname-container").style.display = "none";
-            }
-        }
+        let nickname = localStorage.getItem("nickname") || "";
 
         function mineCoin() {
             balance += clickValue;
@@ -240,15 +211,39 @@
             leaderboard.style.opacity = "0";
         }
 
-        function showError(msg) {
-            let errorBox = document.getElementById("error-message");
-            errorBox.innerText = msg;
-            errorBox.style.display = "block";
-            errorBox.style.opacity = "1";
-            setTimeout(() => {
-                errorBox.style.opacity = "0";
-                setTimeout(() => errorBox.style.display = "none", 500);
-            }, 1500);
+        function loadLeaderboard() {
+            let leaderboard = [
+                {name: nickname, score: balance},
+                {name: "Игрок1", score: 150},
+                {name: "Игрок2", score: 120},
+                {name: "Игрок3", score: 100}
+            ];
+            leaderboard.sort((a, b) => b.score - a.score);
+            let list = document.getElementById("leaderboard-list");
+            list.innerHTML = "";
+            leaderboard.forEach((player, index) => {
+                let li = document.createElement("li");
+                li.innerText = `${index + 1}. ${player.name} - ${player.score} монет`;
+                list.appendChild(li);
+            });
+        }
+
+        function saveNickname() {
+            let input = document.getElementById("nickname-input").value.trim();
+            if (input) {
+                nickname = input;
+                localStorage.setItem("nickname", nickname);
+                document.getElementById("nickname-popup").style.display = "none";
+            }
+        }
+
+        function generateNickname() {
+            let randomNick = "Игрок" + Math.floor(Math.random() * 10000);
+            document.getElementById("nickname-input").value = randomNick;
+        }
+
+        if (!nickname) {
+            document.getElementById("nickname-popup").style.display = "block";
         }
     </script>
 </body>
