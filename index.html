@@ -92,6 +92,23 @@
             padding: 10px;
             border-bottom: 1px solid #ddd;
         }
+        .close-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: red;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            font-size: 18px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        .close-btn:hover {
+            background: darkred;
+        }
     </style>
 </head>
 <body>
@@ -109,6 +126,7 @@
 
     <button class="leaderboard-btn" onclick="showLeaderboard()">🏆</button>
     <div class="leaderboard-container" id="leaderboard">
+        <button class="close-btn" onclick="hideLeaderboard()">×</button>
         <h2>Топ игроков</h2>
         <ul class="leaderboard-list" id="leaderboard-list"></ul>
     </div>
@@ -152,6 +170,12 @@
             leaderboard.style.top = "10vh";
             leaderboard.style.opacity = "1";
             loadLeaderboard();
+        }
+
+        function hideLeaderboard() {
+            let leaderboard = document.getElementById("leaderboard");
+            leaderboard.style.top = "-100vh";
+            leaderboard.style.opacity = "0";
         }
 
         function loadLeaderboard() {
