@@ -31,6 +31,9 @@
         .button:active {
             transform: scale(0.95);
         }
+        .shop {
+            margin-top: 30px;
+        }
         .shop button {
             display: block;
             width: 200px;
@@ -108,40 +111,43 @@
         }
         .error-message {
             position: fixed;
-            top: -50px;
+            top: 10px;
             left: 50%;
             transform: translateX(-50%);
-            background: red;
+            background: rgba(255, 0, 0, 0.8);
             color: white;
-            padding: 10px;
+            padding: 10px 20px;
             border-radius: 5px;
+            display: none;
             opacity: 0;
-            transition: top 0.5s, opacity 0.5s;
+            transition: opacity 0.5s ease-in-out;
         }
         .nickname-container {
             position: fixed;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            background: linear-gradient(135deg, #5e35b1, #1e88e5);
+            background: linear-gradient(135deg, #6a11cb, #2575fc);
             padding: 20px;
             border-radius: 10px;
             text-align: center;
+            box-shadow: 0px 0px 10px rgba(0,0,0,0.3);
             display: none;
         }
-        .nickname-input {
+        .nickname-container input {
             padding: 10px;
-            border-radius: 5px;
             border: none;
-            font-size: 16px;
+            border-radius: 5px;
+            width: 80%;
+            margin-bottom: 10px;
         }
-        .nickname-button {
-            margin-top: 10px;
-            padding: 10px;
-            background: #ffcc00;
+        .nickname-container button {
+            padding: 10px 15px;
             border: none;
-            cursor: pointer;
             border-radius: 5px;
+            background: #f39c12;
+            color: white;
+            cursor: pointer;
         }
     </style>
 </head>
@@ -165,22 +171,33 @@
         <ul class="leaderboard-list" id="leaderboard-list"></ul>
     </div>
 
-    <div class="error-message" id="error-message"></div>
+    <div class="error-message" id="error-message">Недостаточно монет!</div>
 
     <div class="nickname-container" id="nickname-container">
         <h2>Введите ник</h2>
-        <input type="text" id="nickname-input" class="nickname-input" placeholder="Ваш ник">
-        <button class="nickname-button" onclick="setNickname()">OK</button>
+        <input type="text" id="nickname-input" placeholder="Ваш ник">
+        <button onclick="setNickname()">OK</button>
     </div>
 
     <script>
         let balance = 0;
         let clickValue = 1;
         let autoMining = false;
-        let nickname = localStorage.getItem("nickname") || "";
+        let nickname = localStorage.getItem("nickname") || null;
+        let tg = window.Telegram.WebApp;
+        tg.expand();
 
         if (!nickname) {
             document.getElementById("nickname-container").style.display = "block";
+        }
+
+        function setNickname() {
+            let input = document.getElementById("nickname-input").value.trim();
+            if (input && input.indexOf(" ") === -1) {
+                nickname = input;
+                localStorage.setItem("nickname", nickname);
+                document.getElementById("nickname-container").style.display = "none";
+            }
         }
 
         function mineCoin() {
@@ -210,26 +227,28 @@
             document.getElementById("balance").innerText = balance;
         }
 
-        function showError(message) {
-            let errorMessage = document.getElementById("error-message");
-            errorMessage.innerText = message;
-            errorMessage.style.top = "10px";
-            errorMessage.style.opacity = "1";
-            setTimeout(() => {
-                errorMessage.style.top = "-50px";
-                errorMessage.style.opacity = "0";
-            }, 2000);
+        function showLeaderboard() {
+            let leaderboard = document.getElementById("leaderboard");
+            leaderboard.style.top = "10vh";
+            leaderboard.style.opacity = "1";
+            loadLeaderboard();
         }
 
-        function setNickname() {
-            let input = document.getElementById("nickname-input").value.trim();
-            if (input && !input.includes(" ")) {
-                nickname = input;
-            } else {
-                nickname = "Игрок" + Math.floor(Math.random() * 1000);
-            }
-            localStorage.setItem("nickname", nickname);
-            document.getElementById("nickname-container").style.display = "none";
+        function hideLeaderboard() {
+            let leaderboard = document.getElementById("leaderboard");
+            leaderboard.style.top = "-100vh";
+            leaderboard.style.opacity = "0";
+        }
+
+        function showError(msg) {
+            let errorBox = document.getElementById("error-message");
+            errorBox.innerText = msg;
+            errorBox.style.display = "block";
+            errorBox.style.opacity = "1";
+            setTimeout(() => {
+                errorBox.style.opacity = "0";
+                setTimeout(() => errorBox.style.display = "none", 500);
+            }, 1500);
         }
     </script>
 </body>
