@@ -31,9 +31,6 @@
         .button:active {
             transform: scale(0.95);
         }
-        .shop {
-            margin-top: 30px;
-        }
         .shop button {
             display: block;
             width: 200px;
@@ -109,55 +106,46 @@
         .close-btn:hover {
             background: darkred;
         }
-        /* Стили окна регистрации */
-        .register-container {
+        .error-message {
+            position: fixed;
+            top: -50px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: red;
+            color: white;
+            padding: 10px;
+            border-radius: 5px;
+            opacity: 0;
+            transition: top 0.5s, opacity 0.5s;
+        }
+        .nickname-container {
             position: fixed;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            background: linear-gradient(135deg, #662d8c, #ed1e79);
+            background: linear-gradient(135deg, #5e35b1, #1e88e5);
             padding: 20px;
             border-radius: 10px;
             text-align: center;
             display: none;
-            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.2);
         }
-        .register-container input {
+        .nickname-input {
             padding: 10px;
-            width: 80%;
+            border-radius: 5px;
+            border: none;
+            font-size: 16px;
+        }
+        .nickname-button {
             margin-top: 10px;
-            border: none;
-            border-radius: 5px;
-            text-align: center;
-        }
-        .register-container button {
-            background-color: #27ae60;
-            color: white;
             padding: 10px;
+            background: #ffcc00;
             border: none;
-            border-radius: 5px;
             cursor: pointer;
-            margin-top: 10px;
-        }
-        .dice-btn {
-            background-color: #e74c3c;
-            padding: 10px;
-            border: none;
-            color: white;
             border-radius: 5px;
-            cursor: pointer;
-            margin-left: 10px;
         }
     </style>
 </head>
 <body>
-    <div class="register-container" id="register">
-        <h2>Введите ник</h2>
-        <input type="text" id="nickname" placeholder="Введите ник без пробелов">
-        <button onclick="registerUser()">OK</button>
-        <button class="dice-btn" onclick="generateRandomNick()">🎲</button>
-    </div>
-
     <div class="container">
         <h1>Crypto Clicker</h1>
         <p>Баланс: <span id="balance">0</span> монет</p>
@@ -177,30 +165,22 @@
         <ul class="leaderboard-list" id="leaderboard-list"></ul>
     </div>
 
+    <div class="error-message" id="error-message"></div>
+
+    <div class="nickname-container" id="nickname-container">
+        <h2>Введите ник</h2>
+        <input type="text" id="nickname-input" class="nickname-input" placeholder="Ваш ник">
+        <button class="nickname-button" onclick="setNickname()">OK</button>
+    </div>
+
     <script>
         let balance = 0;
-        let nickname = localStorage.getItem("nickname");
         let clickValue = 1;
         let autoMining = false;
+        let nickname = localStorage.getItem("nickname") || "";
 
         if (!nickname) {
-            document.getElementById("register").style.display = "block";
-        }
-
-        function registerUser() {
-            let inputNick = document.getElementById("nickname").value.trim();
-            if (inputNick === "" || inputNick.includes(" ")) {
-                alert("Ник не должен содержать пробелы!");
-                return;
-            }
-            localStorage.setItem("nickname", inputNick);
-            nickname = inputNick;
-            document.getElementById("register").style.display = "none";
-        }
-
-        function generateRandomNick() {
-            let randomNick = "User" + Math.floor(Math.random() * 9999);
-            document.getElementById("nickname").value = randomNick;
+            document.getElementById("nickname-container").style.display = "block";
         }
 
         function mineCoin() {
@@ -222,7 +202,7 @@
                 }
                 updateUI();
             } else {
-                alert("Недостаточно монет!");
+                showError("Недостаточно монет!");
             }
         }
 
@@ -230,12 +210,26 @@
             document.getElementById("balance").innerText = balance;
         }
 
-        function showLeaderboard() {
-            document.getElementById("leaderboard").style.opacity = "1";
+        function showError(message) {
+            let errorMessage = document.getElementById("error-message");
+            errorMessage.innerText = message;
+            errorMessage.style.top = "10px";
+            errorMessage.style.opacity = "1";
+            setTimeout(() => {
+                errorMessage.style.top = "-50px";
+                errorMessage.style.opacity = "0";
+            }, 2000);
         }
 
-        function hideLeaderboard() {
-            document.getElementById("leaderboard").style.opacity = "0";
+        function setNickname() {
+            let input = document.getElementById("nickname-input").value.trim();
+            if (input && !input.includes(" ")) {
+                nickname = input;
+            } else {
+                nickname = "Игрок" + Math.floor(Math.random() * 1000);
+            }
+            localStorage.setItem("nickname", nickname);
+            document.getElementById("nickname-container").style.display = "none";
         }
     </script>
 </body>
