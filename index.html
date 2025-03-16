@@ -186,7 +186,7 @@
     </div>
 
     <script>
-        let balance = 0;
+        let balance = parseInt(localStorage.getItem("balance")) || 0;
         let clickValue = 1;
         let autoMining = false;
         let nickname = localStorage.getItem("nickname") || "";
@@ -198,6 +198,7 @@
             document.getElementById("register").style.display = "block";
         } else {
             document.querySelector(".container").style.display = "block";
+            updateUI();
         }
 
         function generateNickname() {
@@ -212,7 +213,18 @@
                 nickname = inputNick;
                 document.getElementById("register").style.display = "none";
                 document.querySelector(".container").style.display = "block";
+                updateUI();
             }
+        }
+
+        function mineCoin() {
+            balance += clickValue;
+            localStorage.setItem("balance", balance);
+            updateUI();
+        }
+
+        function updateUI() {
+            document.getElementById("balance").innerText = balance;
         }
 
         function showLeaderboard() {
