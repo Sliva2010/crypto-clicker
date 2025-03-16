@@ -31,9 +31,6 @@
         .button:active {
             transform: scale(0.95);
         }
-        .shop {
-            margin-top: 30px;
-        }
         .shop button {
             display: block;
             width: 200px;
@@ -111,25 +108,19 @@
         }
         .error-message {
             position: fixed;
-            top: 10%;
+            top: -50px;
             left: 50%;
-            transform: translate(-50%, -50%);
+            transform: translateX(-50%);
             background: rgba(255, 0, 0, 0.8);
             color: white;
-            padding: 15px;
-            border-radius: 10px;
-            display: none;
-            animation: fadeInOut 3s ease-in-out;
-        }
-        @keyframes fadeInOut {
-            0% { opacity: 0; }
-            20% { opacity: 1; }
-            80% { opacity: 1; }
-            100% { opacity: 0; }
+            padding: 10px 20px;
+            border-radius: 5px;
+            transition: top 0.5s ease-in-out, opacity 0.5s ease-in-out;
+            opacity: 0;
         }
         .nickname-container {
             position: fixed;
-            top: 30%;
+            top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
             background: linear-gradient(135deg, #6a11cb, #2575fc);
@@ -137,15 +128,31 @@
             border-radius: 10px;
             text-align: center;
             box-shadow: 0px 0px 10px rgba(0,0,0,0.2);
+            display: none;
+        }
+        .nickname-container input {
+            width: 80%;
+            padding: 10px;
+            margin-bottom: 10px;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+        .nickname-container button {
+            padding: 10px 20px;
+            font-size: 16px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
         }
     </style>
 </head>
 <body>
-    <div class="nickname-container" id="nickname-container">
-        <h2>Введите никнейм</h2>
-        <input type="text" id="nickname-input" placeholder="Ваш никнейм">
-        <button onclick="setNickname()">OK</button>
+    <div id="nickname-container" class="nickname-container">
+        <h2>Введите ник</h2>
+        <input type="text" id="nickname-input" placeholder="Введите ник без пробелов">
         <button onclick="generateRandomNickname()">🎲</button>
+        <button onclick="setNickname()">OK</button>
     </div>
 
     <div class="container">
@@ -167,12 +174,14 @@
         <ul class="leaderboard-list" id="leaderboard-list"></ul>
     </div>
 
-    <div class="error-message" id="error-message">Недостаточно монет!</div>
+    <div id="error-message" class="error-message">Недостаточно монет!</div>
 
     <script>
         let balance = 0;
         let clickValue = 1;
         let autoMining = false;
+        let tg = window.Telegram.WebApp;
+        tg.expand();
 
         function mineCoin() {
             balance += clickValue;
@@ -193,16 +202,12 @@
                 }
                 updateUI();
             } else {
-                showError();
+                showError("Недостаточно монет!");
             }
         }
 
-        function showError() {
-            let errorBox = document.getElementById("error-message");
-            errorBox.style.display = "block";
-            setTimeout(() => {
-                errorBox.style.display = "none";
-            }, 3000);
+        function updateUI() {
+            document.getElementById("balance").innerText = balance;
         }
 
         function showLeaderboard() {
@@ -219,22 +224,8 @@
         }
 
         function loadLeaderboard() {
-            let leaderboard = JSON.parse(localStorage.getItem("leaderboard")) || [];
-            let currentPlayer = {
-                name: localStorage.getItem("nickname") || "Без имени",
-                score: balance
-            };
-
-            let existingPlayer = leaderboard.find(player => player.name === currentPlayer.name);
-            if (existingPlayer) {
-                existingPlayer.score = balance;
-            } else {
-                leaderboard.push(currentPlayer);
-            }
-
-            leaderboard.sort((a, b) => b.score - a.score);
-            localStorage.setItem("leaderboard", JSON.stringify(leaderboard));
-
+            let nickname = localStorage.getItem("nickname") || "Игрок";
+            let leaderboard = [{ name: nickname, score: balance }];
             let list = document.getElementById("leaderboard-list");
             list.innerHTML = "";
             leaderboard.forEach((player, index) => {
@@ -242,6 +233,13 @@
                 li.innerText = `${index + 1}. ${player.name} - ${player.score} монет`;
                 list.appendChild(li);
             });
+        }
+
+        function setNickname() {
+            let nicknameInput = document.getElementById("nickname-input").value.trim();
+            if (!nicknameInput || nicknameInput.includes(" ")) return;
+            localStorage.setItem("nickname", nicknameInput);
+            document.getElementById("nickname-container").style.display = "none";
         }
     </script>
 </body>
