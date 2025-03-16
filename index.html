@@ -16,7 +16,6 @@
         }
         .container {
             margin-top: 50px;
-            display: none;
         }
         .button {
             background-color: #f39c12;
@@ -53,12 +52,12 @@
         }
         .leaderboard-btn {
             position: fixed;
-            right: 15px;
-            bottom: 15px;
-            background-color: #ff5733;
-            color: white;
-            padding: 8px 12px;
-            font-size: 20px;
+            right: 20px;
+            top: 20px;
+            background-color: #ffd700;
+            color: black;
+            padding: 10px 15px;
+            font-size: 22px;
             border-radius: 50%;
             cursor: pointer;
             transition: transform 0.1s;
@@ -68,21 +67,34 @@
         }
         .leaderboard-container {
             position: fixed;
-            top: -100vh;
+            top: 50%;
             left: 50%;
-            transform: translateX(-50%);
+            transform: translate(-50%, -50%) scale(0.5);
             width: 80%;
             max-width: 400px;
-            background: linear-gradient(135deg, #9b59b6, #2980b9);
+            background: linear-gradient(135deg, #8e44ad, #3498db);
             color: white;
             border-radius: 10px;
             padding: 20px;
+            box-shadow: 0px 0px 10px rgba(0,0,0,0.2);
             text-align: left;
-            transition: top 0.5s ease-in-out, opacity 0.5s ease-in-out;
             opacity: 0;
+            transition: opacity 0.4s ease-out, transform 0.4s ease-out;
+        }
+        .leaderboard-container.show {
+            opacity: 1;
+            transform: translate(-50%, -50%) scale(1);
         }
         .leaderboard-container h2 {
             text-align: center;
+        }
+        .leaderboard-list {
+            list-style: none;
+            padding: 0;
+        }
+        .leaderboard-list li {
+            padding: 10px;
+            border-bottom: 1px solid #ddd;
         }
         .close-btn {
             position: absolute;
@@ -101,70 +113,14 @@
         .close-btn:hover {
             background: darkred;
         }
-        /* Ошибки */
-        .error-popup {
-            position: fixed;
-            bottom: -100px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: rgba(255, 0, 0, 0.9);
-            color: white;
-            padding: 15px;
-            border-radius: 10px;
-            font-size: 18px;
-            transition: bottom 0.5s ease-in-out, opacity 0.5s ease-in-out;
-            opacity: 0;
-        }
-        /* Регистрация */
-        .register-container {
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background: linear-gradient(135deg, #8e44ad, #3498db);
-            color: white;
-            padding: 20px;
-            border-radius: 10px;
-            text-align: center;
-            box-shadow: 0px 0px 10px rgba(0,0,0,0.2);
-        }
-        .register-input {
-            padding: 10px;
-            font-size: 16px;
-            border: none;
-            border-radius: 5px;
-            width: 80%;
-            text-align: center;
-        }
-        .register-btn {
-            margin-top: 10px;
-            padding: 10px 20px;
-            font-size: 16px;
-            background-color: #27ae60;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: background 0.3s;
-        }
-        .register-btn:hover {
-            background-color: #219150;
-        }
     </style>
 </head>
 <body>
-
-    <div class="register-container" id="register">
-        <h2>Введите ник</h2>
-        <input type="text" id="nickname" class="register-input" placeholder="Ваш ник">
-        <button class="register-btn" onclick="saveNickname()">Продолжить</button>
-    </div>
-
     <div class="container">
         <h1>Crypto Clicker</h1>
         <p>Баланс: <span id="balance">0</span> монет</p>
         <button class="button" onclick="mineCoin()">💰 Добыть монету</button>
-
+        
         <div class="shop">
             <h2>Магазин улучшений</h2>
             <button onclick="buyUpgrade(1, 10)">⚡ Ускорение (10 монет)</button>
@@ -179,35 +135,15 @@
         <ul class="leaderboard-list" id="leaderboard-list"></ul>
     </div>
 
-    <div class="error-popup" id="error-popup">Недостаточно монет!</div>
-
     <script>
-        let balance = parseInt(localStorage.getItem("balance")) || 0;
-        let nickname = localStorage.getItem("nickname") || "";
+        let balance = 0;
         let clickValue = 1;
         let autoMining = false;
-
-        if (!nickname) {
-            document.getElementById("register").style.display = "block";
-        } else {
-            document.querySelector(".container").style.display = "block";
-            updateUI();
-        }
-
-        function saveNickname() {
-            let inputNick = document.getElementById("nickname").value.trim();
-            if (inputNick && !inputNick.includes(" ")) {
-                localStorage.setItem("nickname", inputNick);
-                nickname = inputNick;
-                document.getElementById("register").style.display = "none";
-                document.querySelector(".container").style.display = "block";
-                updateUI();
-            }
-        }
+        let tg = window.Telegram.WebApp;
+        tg.expand();
 
         function mineCoin() {
             balance += clickValue;
-            localStorage.setItem("balance", balance);
             updateUI();
         }
 
@@ -220,30 +156,44 @@
                     autoMining = true;
                     setInterval(() => {
                         balance += clickValue;
-                        localStorage.setItem("balance", balance);
                         updateUI();
                     }, 2000);
                 }
-                localStorage.setItem("balance", balance);
                 updateUI();
             } else {
                 showError("Недостаточно монет!");
             }
         }
 
-        function showError(message) {
-            let errorPopup = document.getElementById("error-popup");
-            errorPopup.innerText = message;
-            errorPopup.style.bottom = "20px";
-            errorPopup.style.opacity = "1";
-            setTimeout(() => {
-                errorPopup.style.bottom = "-100px";
-                errorPopup.style.opacity = "0";
-            }, 2000);
-        }
-
         function updateUI() {
             document.getElementById("balance").innerText = balance;
+        }
+
+        function showLeaderboard() {
+            let leaderboard = document.getElementById("leaderboard");
+            leaderboard.classList.add("show");
+            loadLeaderboard();
+        }
+
+        function hideLeaderboard() {
+            let leaderboard = document.getElementById("leaderboard");
+            leaderboard.classList.remove("show");
+        }
+
+        function loadLeaderboard() {
+            let leaderboard = [
+                {name: "Игрок1", score: 150},
+                {name: "Игрок2", score: 120},
+                {name: "Игрок3", score: 100},
+                {name: "Ты", score: balance},
+            ];
+            let list = document.getElementById("leaderboard-list");
+            list.innerHTML = "";
+            leaderboard.forEach((player, index) => {
+                let li = document.createElement("li");
+                li.innerText = `${index + 1}. ${player.name} - ${player.score} монет`;
+                list.appendChild(li);
+            });
         }
     </script>
 </body>
