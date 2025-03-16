@@ -65,28 +65,9 @@
         .leaderboard-btn:active {
             transform: scale(0.9);
         }
-        .leaderboard-container {
-            position: fixed;
-            top: -100vh;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 80%;
-            max-width: 400px;
-            background: linear-gradient(135deg, #8e44ad, #3498db);
-            color: white;
-            border-radius: 10px;
-            padding: 20px;
-            box-shadow: 0px 0px 10px rgba(0,0,0,0.2);
-            text-align: left;
-            transition: top 0.5s ease-in-out, opacity 0.5s ease-in-out;
-            opacity: 0;
-        }
-        .leaderboard-container h2 {
-            text-align: center;
-        }
         .error-popup {
             position: fixed;
-            top: -100vh;
+            top: -100px;
             left: 50%;
             transform: translateX(-50%);
             background: red;
@@ -140,7 +121,7 @@
                 }
                 updateUI();
             } else {
-                showError("Недостаточно монет!");
+                showError();
             }
         }
 
@@ -148,13 +129,12 @@
             document.getElementById("balance").innerText = balance;
         }
 
-        function showError(message) {
+        function showError() {
             let errorPopup = document.getElementById("error-popup");
-            errorPopup.innerText = message;
-            errorPopup.style.top = "10vh";
+            errorPopup.style.top = "20px";
             errorPopup.style.opacity = "1";
             setTimeout(() => {
-                errorPopup.style.top = "-100vh";
+                errorPopup.style.top = "-100px";
                 errorPopup.style.opacity = "0";
             }, 2000);
         }
