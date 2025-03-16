@@ -9,8 +9,10 @@
         body {
             text-align: center;
             font-family: Arial, sans-serif;
-            background: linear-gradient(135deg, #1e1e1e, #2c3e50);
+            background: linear-gradient(135deg, #6a11cb, #2575fc);
             color: white;
+            margin: 0;
+            padding: 0;
         }
         .container {
             margin-top: 50px;
@@ -23,8 +25,8 @@
             border: none;
             border-radius: 10px;
             cursor: pointer;
-            margin: 10px 0;
-            transition: transform 0.1s;
+            margin-top: 20px;
+            transition: transform 0.1s ease-in-out;
         }
         .button:active {
             transform: scale(0.95);
@@ -35,7 +37,7 @@
         .shop button {
             display: block;
             width: 220px;
-            margin: 15px auto;
+            margin: 10px auto;
             padding: 12px;
             font-size: 18px;
             background-color: #3498db;
@@ -43,14 +45,10 @@
             border: none;
             border-radius: 5px;
             cursor: pointer;
-            transition: transform 0.1s;
+            transition: transform 0.1s ease-in-out;
         }
         .shop button:active {
             transform: scale(0.95);
-        }
-        #invite {
-            background-color: #2ecc71;
-            margin-top: 20px;
         }
     </style>
 </head>
@@ -65,12 +63,10 @@
             <button onclick="buyUpgrade(1, 10)">⚡ Ускорение (10 монет)</button>
             <button onclick="buyUpgrade(2, 25)">🤖 Авто-майнинг (25 монет)</button>
         </div>
-
-        <button id="invite" onclick="inviteFriend()">📩 Пригласить друга</button>
     </div>
     
     <script>
-        let balance = localStorage.getItem("balance") ? parseInt(localStorage.getItem("balance")) : 0;
+        let balance = 0;
         let clickValue = 1;
         let autoMining = false;
         let tg = window.Telegram.WebApp;
@@ -79,7 +75,6 @@
         function mineCoin() {
             balance += clickValue;
             updateUI();
-            saveBalance();
         }
 
         function buyUpgrade(type, cost) {
@@ -92,48 +87,17 @@
                     setInterval(() => {
                         balance += clickValue;
                         updateUI();
-                        saveBalance();
                     }, 2000);
                 }
                 updateUI();
-                saveBalance();
             } else {
-                alert("Не хватает монет!");
-            }
-        }
-
-        function inviteFriend() {
-            let inviteLink = window.location.href + "?ref=" + tg.initDataUnsafe.user.id;
-            navigator.clipboard.writeText(inviteLink).then(() => {
-                alert("Ссылка скопирована! Отправьте её другу.");
-            }).catch(err => {
-                prompt("Скопируйте ссылку вручную:", inviteLink);
-            });
-        }
-
-        function checkReferral() {
-            let params = new URLSearchParams(window.location.search);
-            if (params.has("ref")) {
-                let referrer = params.get("ref");
-                if (!localStorage.getItem("referred")) {
-                    balance += 10;
-                    localStorage.setItem("referred", "true");
-                    updateUI();
-                    saveBalance();
-                }
+                alert("Недостаточно монет!");
             }
         }
 
         function updateUI() {
             document.getElementById("balance").innerText = balance;
         }
-
-        function saveBalance() {
-            localStorage.setItem("balance", balance);
-        }
-
-        checkReferral();
-        updateUI();
     </script>
 </body>
 </html>
