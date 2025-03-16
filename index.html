@@ -67,9 +67,9 @@
         }
         .leaderboard-container {
             position: fixed;
-            top: 50%;
+            top: -100vh;
             left: 50%;
-            transform: translate(-50%, -50%) scale(0.5);
+            transform: translateX(-50%);
             width: 80%;
             max-width: 400px;
             background: linear-gradient(135deg, #8e44ad, #3498db);
@@ -78,12 +78,8 @@
             padding: 20px;
             box-shadow: 0px 0px 10px rgba(0,0,0,0.2);
             text-align: left;
+            transition: top 0.5s ease-in-out, opacity 0.5s ease-in-out;
             opacity: 0;
-            transition: opacity 0.4s ease-out, transform 0.4s ease-out;
-        }
-        .leaderboard-container.show {
-            opacity: 1;
-            transform: translate(-50%, -50%) scale(1);
         }
         .leaderboard-container h2 {
             text-align: center;
@@ -113,25 +109,55 @@
         .close-btn:hover {
             background: darkred;
         }
-        .error-message {
+        /* Стили окна регистрации */
+        .register-container {
             position: fixed;
             top: 50%;
             left: 50%;
-            transform: translate(-50%, -50%) scale(0.5);
-            background: red;
-            color: white;
-            padding: 15px;
+            transform: translate(-50%, -50%);
+            background: linear-gradient(135deg, #662d8c, #ed1e79);
+            padding: 20px;
             border-radius: 10px;
-            opacity: 0;
-            transition: opacity 0.4s ease-out, transform 0.4s ease-out;
+            text-align: center;
+            display: none;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.2);
         }
-        .error-message.show {
-            opacity: 1;
-            transform: translate(-50%, -50%) scale(1);
+        .register-container input {
+            padding: 10px;
+            width: 80%;
+            margin-top: 10px;
+            border: none;
+            border-radius: 5px;
+            text-align: center;
+        }
+        .register-container button {
+            background-color: #27ae60;
+            color: white;
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+        .dice-btn {
+            background-color: #e74c3c;
+            padding: 10px;
+            border: none;
+            color: white;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-left: 10px;
         }
     </style>
 </head>
 <body>
+    <div class="register-container" id="register">
+        <h2>Введите ник</h2>
+        <input type="text" id="nickname" placeholder="Введите ник без пробелов">
+        <button onclick="registerUser()">OK</button>
+        <button class="dice-btn" onclick="generateRandomNick()">🎲</button>
+    </div>
+
     <div class="container">
         <h1>Crypto Clicker</h1>
         <p>Баланс: <span id="balance">0</span> монет</p>
@@ -145,21 +171,37 @@
     </div>
 
     <button class="leaderboard-btn" onclick="showLeaderboard()">🏆</button>
-    
     <div class="leaderboard-container" id="leaderboard">
         <button class="close-btn" onclick="hideLeaderboard()">×</button>
         <h2>Топ игроков</h2>
         <ul class="leaderboard-list" id="leaderboard-list"></ul>
     </div>
 
-    <div class="error-message" id="error-message"></div>
-
     <script>
         let balance = 0;
+        let nickname = localStorage.getItem("nickname");
         let clickValue = 1;
         let autoMining = false;
-        let tg = window.Telegram.WebApp;
-        tg.expand();
+
+        if (!nickname) {
+            document.getElementById("register").style.display = "block";
+        }
+
+        function registerUser() {
+            let inputNick = document.getElementById("nickname").value.trim();
+            if (inputNick === "" || inputNick.includes(" ")) {
+                alert("Ник не должен содержать пробелы!");
+                return;
+            }
+            localStorage.setItem("nickname", inputNick);
+            nickname = inputNick;
+            document.getElementById("register").style.display = "none";
+        }
+
+        function generateRandomNick() {
+            let randomNick = "User" + Math.floor(Math.random() * 9999);
+            document.getElementById("nickname").value = randomNick;
+        }
 
         function mineCoin() {
             balance += clickValue;
@@ -180,7 +222,7 @@
                 }
                 updateUI();
             } else {
-                showError("Недостаточно монет!");
+                alert("Недостаточно монет!");
             }
         }
 
@@ -189,39 +231,11 @@
         }
 
         function showLeaderboard() {
-            let leaderboard = document.getElementById("leaderboard");
-            leaderboard.classList.add("show");
-            loadLeaderboard();
+            document.getElementById("leaderboard").style.opacity = "1";
         }
 
         function hideLeaderboard() {
-            let leaderboard = document.getElementById("leaderboard");
-            leaderboard.classList.remove("show");
-        }
-
-        function loadLeaderboard() {
-            let leaderboard = [
-                {name: "Игрок1", score: 150},
-                {name: "Игрок2", score: 120},
-                {name: "Игрок3", score: 100},
-                {name: "Ты", score: balance},
-            ];
-            let list = document.getElementById("leaderboard-list");
-            list.innerHTML = "";
-            leaderboard.forEach((player, index) => {
-                let li = document.createElement("li");
-                li.innerText = `${index + 1}. ${player.name} - ${player.score} монет`;
-                list.appendChild(li);
-            });
-        }
-
-        function showError(message) {
-            let errorBox = document.getElementById("error-message");
-            errorBox.innerText = message;
-            errorBox.classList.add("show");
-            setTimeout(() => {
-                errorBox.classList.remove("show");
-            }, 2000);
+            document.getElementById("leaderboard").style.opacity = "0";
         }
     </script>
 </body>
