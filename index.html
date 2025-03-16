@@ -73,17 +73,19 @@
     </div>
     
     <script>
-        let balance = 0;
+        let balance = localStorage.getItem("balance") ? parseInt(localStorage.getItem("balance")) : 0;
         let clickValue = 1;
         let autoMining = false;
         let tg = window.Telegram.WebApp;
         tg.expand();
 
+        // Функция добычи монет
         function mineCoin() {
             balance += clickValue;
             updateUI();
         }
 
+        // Функция покупки улучшений
         function buyUpgrade(type, cost) {
             if (balance >= cost) {
                 balance -= cost;
@@ -102,10 +104,13 @@
             }
         }
 
+        // Функция обновления интерфейса
         function updateUI() {
             document.getElementById("balance").innerText = balance;
+            localStorage.setItem("balance", balance);
         }
 
+        // Функция приглашения друга
         function inviteFriend() {
             let userId = tg.initDataUnsafe.user?.id;
             if (!userId) {
@@ -134,6 +139,26 @@
                 }
             });
         }
+
+        // Проверка реферальной ссылки и выдача бонуса
+        function checkReferral() {
+            let urlParams = new URLSearchParams(window.location.search);
+            let referrerId = urlParams.get("start");
+
+            if (referrerId && !localStorage.getItem("referrer")) {
+                balance += 25; // Бонус новому игроку
+                localStorage.setItem("referrer", referrerId);
+                tg.showPopup({ message: "🎉 Вы получили 25 монет за регистрацию по приглашению!" });
+                updateUI();
+
+                // Отправка сообщения пригласителю (ЭТО НУЖНО ДЕЛАТЬ ЧЕРЕЗ СЕРВЕР!)
+                tg.showPopup({ message: `⚠️ ВНИМАНИЕ: Начислить 50 монет пригласителю (${referrerId}) можно только через сервер!` });
+            }
+        }
+
+        // Загружаем баланс при старте
+        updateUI();
+        checkReferral();
     </script>
 </body>
 </html>
