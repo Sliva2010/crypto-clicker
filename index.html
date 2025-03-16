@@ -19,44 +19,37 @@
             color: white;
             font-family: 'Segoe UI', system-ui;
             min-height: 100vh;
-            display: grid;
-            grid-template-areas: 
-                "header header"
-                "main sidebar"
-                "station station";
-            grid-template-columns: 1fr 300px;
-            grid-template-rows: auto 1fr auto;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 1rem;
         }
 
         /* Шапка */
         .header {
-            grid-area: header;
-            padding: 1rem;
-            border-bottom: 1px solid rgba(255,255,255,0.1);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .title {
+            font-size: 2.5em;
+            margin: 0;
+            background: linear-gradient(45deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
         }
 
         .energy-badge {
             background: rgba(56, 189, 248, 0.15);
             padding: 0.5rem 1rem;
             border-radius: 999px;
-            display: flex;
+            display: inline-flex;
             align-items: center;
             gap: 0.5rem;
+            margin-top: 0.5rem;
         }
 
-        /* Основная зона */
-        .main {
-            grid-area: main;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            padding: 2rem;
-            gap: 2rem;
-        }
-
+        /* Основная кнопка */
         .main-button {
             width: 240px;
             height: 240px;
@@ -71,6 +64,7 @@
             justify-content: center;
             gap: 1rem;
             box-shadow: 0 0 40px rgba(56, 189, 248, 0.3);
+            margin-bottom: 2rem;
         }
 
         .main-button:active {
@@ -85,12 +79,10 @@
             pointer-events: none;
         }
 
-        /* Боковая панель */
-        .sidebar {
-            grid-area: sidebar;
-            background: rgba(255,255,255,0.05);
-            padding: 1.5rem;
-            border-left: 1px solid rgba(255,255,255,0.1);
+        /* Улучшения */
+        .upgrades {
+            width: 100%;
+            max-width: 400px;
         }
 
         .upgrade-card {
@@ -109,25 +101,21 @@
                 transparent);
         }
 
-        /* Станция */
-        .station {
-            grid-area: station;
-            padding: 2rem;
-            border-top: 1px solid rgba(255,255,255,0.1);
-            display: flex;
-            align-items: center;
-            gap: 1rem;
+        /* Прогресс */
+        .progress {
+            width: 100%;
+            max-width: 400px;
+            margin-top: 2rem;
         }
 
-        .progress {
-            flex-grow: 1;
+        .progress-bar {
             height: 8px;
             background: rgba(255,255,255,0.1);
             border-radius: 4px;
             overflow: hidden;
         }
 
-        .progress-bar {
+        .progress-fill {
             height: 100%;
             background: linear-gradient(90deg, 
                 var(--primary), 
@@ -143,21 +131,19 @@
 </head>
 <body>
     <header class="header">
-        <h1>🚀 Space Clicker</h1>
+        <h1 class="title">Space Clicker</h1>
         <div class="energy-badge">
             ⚡ <span id="energy">0</span> энергии
         </div>
     </header>
 
-    <main class="main">
-        <button class="main-button" id="clickButton">
-            <span style="font-size: 2.5em;">⚡</span>
-            <span>Кликни!</span>
-            <span style="font-size: 0.9em; opacity: 0.8;">+<span id="clickPower">1</span>/клик</span>
-        </button>
-    </main>
+    <button class="main-button" id="clickButton">
+        <span style="font-size: 2.5em;">⚡</span>
+        <span>Кликни!</span>
+        <span style="font-size: 0.9em; opacity: 0.8;">+<span id="clickPower">1</span>/клик</span>
+    </button>
 
-    <aside class="sidebar">
+    <section class="upgrades">
         <h2>🛠 Улучшения</h2>
         <div class="upgrade-card" data-upgrade="1">
             <h3>☀️ Солнечные панели</h3>
@@ -170,12 +156,15 @@
             <p>+1 к силе клика</p>
             <div class="price">🪙 <span>100</span></div>
         </div>
-    </aside>
+    </section>
 
-    <section class="station">
-        <div class="level">🚀 Уровень <span>1</span></div>
-        <div class="progress">
-            <div class="progress-bar" style="width: 10%"></div>
+    <section class="progress">
+        <h2>🚀 Прогресс</h2>
+        <div class="progress-bar">
+            <div class="progress-fill" style="width: 10%"></div>
+        </div>
+        <div style="text-align: center; margin-top: 0.5rem;">
+            Уровень <span id="level">1</span>
         </div>
     </section>
 
@@ -255,8 +244,8 @@
 
             // Прогресс
             const level = Math.floor(state.energy / 1000) + 1;
-            document.querySelector('.level span').textContent = level;
-            document.querySelector('.progress-bar').style.width = 
+            document.getElementById('level').textContent = level;
+            document.querySelector('.progress-fill').style.width = 
                 `${(state.energy % 1000)/10}%`;
         }
 
