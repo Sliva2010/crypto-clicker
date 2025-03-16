@@ -9,8 +9,10 @@
         body {
             text-align: center;
             font-family: Arial, sans-serif;
-            background: linear-gradient(135deg, #6a11cb, #2575fc);
+            background: linear-gradient(45deg, #6a11cb, #2575fc);
             color: white;
+            margin: 0;
+            padding: 0;
         }
         .container {
             margin-top: 50px;
@@ -24,10 +26,14 @@
             border-radius: 10px;
             cursor: pointer;
             margin-top: 20px;
-            transition: transform 0.1s;
+            transition: transform 0.1s, background 0.3s;
         }
         .button:active {
             transform: scale(0.95);
+            background-color: #e67e22;
+        }
+        .shop {
+            margin-top: 30px;
         }
         .shop button {
             display: block;
@@ -40,22 +46,30 @@
             border: none;
             border-radius: 5px;
             cursor: pointer;
-            transition: transform 0.1s;
+            transition: transform 0.1s, background 0.3s;
         }
         .shop button:active {
             transform: scale(0.95);
+            background-color: #2980b9;
         }
+        /* Стили для уведомления */
         .notification {
             position: fixed;
             top: -50px;
             left: 50%;
             transform: translateX(-50%);
-            background-color: red;
+            background: rgba(255, 0, 0, 0.9);
             color: white;
-            padding: 10px 20px;
+            padding: 15px 30px;
             border-radius: 10px;
-            font-size: 16px;
-            transition: top 0.5s ease-in-out;
+            font-size: 18px;
+            font-weight: bold;
+            transition: top 0.5s ease-in-out, opacity 0.5s;
+            opacity: 0;
+        }
+        .notification.show {
+            top: 20px;
+            opacity: 1;
         }
     </style>
 </head>
@@ -71,7 +85,8 @@
             <button onclick="buyUpgrade(2, 25)">🤖 Авто-майнинг (25 монет)</button>
         </div>
     </div>
-    <div id="notification" class="notification">Недостаточно монет!</div>
+
+    <div class="notification" id="notification">Недостаточно монет!</div>
     
     <script>
         let balance = 0;
@@ -110,9 +125,9 @@
         function showNotification(message) {
             let notification = document.getElementById("notification");
             notification.innerText = message;
-            notification.style.top = "20px";
+            notification.classList.add("show");
             setTimeout(() => {
-                notification.style.top = "-50px";
+                notification.classList.remove("show");
             }, 2000);
         }
     </script>
