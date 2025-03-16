@@ -106,22 +106,21 @@
         function inviteFriend() {
             let userId = tg.initDataUnsafe.user?.id;
             if (!userId) {
-                tg.showPopup({
-                    title: "Ошибка",
-                    message: "Не удалось получить ваш ID. Попробуйте перезапустить бота.",
-                    buttons: [{ text: "ОК", type: "close" }]
-                });
+                alert("Ошибка: Не удалось получить ваш ID.");
                 return;
             }
 
             let referralLink = `https://t.me/CryptoClicker1_bot?start=${userId}`;
-            
-            tg.showPopup({
-                title: "Пригласи друга!",
-                message: `Отправь другу эту ссылку, и вы оба получите бонус! \n${referralLink}`,
-                buttons: [{ text: "Скопировать", type: "copy", data: referralLink }, { text: "ОК", type: "close" }]
+
+            // Копируем ссылку в буфер обмена
+            navigator.clipboard.writeText(referralLink).then(() => {
+                alert("Ссылка скопирована! Отправь её друзьям!");
+            }).catch(err => {
+                alert("Ошибка копирования ссылки!");
+                console.error(err);
             });
         }
     </script>
 </body>
 </html>
+
