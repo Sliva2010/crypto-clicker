@@ -109,32 +109,16 @@
         .close-btn:hover {
             background: darkred;
         }
-        .error {
+        .error-message {
             position: fixed;
-            top: 10px;
+            top: -100vh;
             left: 50%;
             transform: translateX(-50%);
-            background: red;
+            background: rgba(255, 0, 0, 0.8);
             color: white;
             padding: 10px 20px;
             border-radius: 5px;
-            display: none;
-        }
-        .nickname-container {
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background: linear-gradient(135deg, #8e44ad, #3498db);
-            padding: 20px;
-            border-radius: 10px;
-            text-align: center;
-            display: none;
-        }
-        .nickname-container input {
-            width: 80%;
-            padding: 10px;
-            margin-bottom: 10px;
+            transition: top 0.5s ease-in-out;
         }
     </style>
 </head>
@@ -158,23 +142,23 @@
         <ul class="leaderboard-list" id="leaderboard-list"></ul>
     </div>
 
-    <div class="error" id="error">Недостаточно монет!</div>
-
-    <div class="nickname-container" id="nickname-container">
-        <h2>Введите ник</h2>
-        <input type="text" id="nickname" placeholder="Ваш ник">
-        <button onclick="setNickname()">OK</button>
-    </div>
+    <div class="error-message" id="error">Недостаточно монет!</div>
 
     <script>
         let balance = 0;
         let clickValue = 1;
         let autoMining = false;
-        let nickname = localStorage.getItem("nickname");
+        let username = localStorage.getItem("username");
+        let tg = window.Telegram.WebApp;
+        tg.expand();
+
+        if (!username) {
+            username = prompt("Введите ваш никнейм (без пробелов):").replace(/\s+/g, '');
+            localStorage.setItem("username", username);
+        }
 
         function mineCoin() {
             balance += clickValue;
-            saveData();
             updateUI();
         }
 
@@ -187,46 +171,50 @@
                     autoMining = true;
                     setInterval(() => {
                         balance += clickValue;
-                        saveData();
                         updateUI();
                     }, 2000);
                 }
-                saveData();
                 updateUI();
             } else {
                 showError();
             }
         }
 
-        function saveData() {
-            localStorage.setItem("balance", balance);
-            localStorage.setItem("nickname", nickname);
-        }
-
-        function showError() {
-            let error = document.getElementById("error");
-            error.style.display = "block";
-            setTimeout(() => error.style.display = "none", 2000);
+        function updateUI() {
+            document.getElementById("balance").innerText = balance;
         }
 
         function showLeaderboard() {
-            document.getElementById("leaderboard").style.top = "10vh";
-            document.getElementById("leaderboard").style.opacity = "1";
+            let leaderboard = JSON.parse(localStorage.getItem("leaderboard")) || [];
+            leaderboard.push({name: username, score: balance});
+            leaderboard.sort((a, b) => b.score - a.score);
+            localStorage.setItem("leaderboard", JSON.stringify(leaderboard));
+
+            let list = document.getElementById("leaderboard-list");
+            list.innerHTML = "";
+            leaderboard.forEach((player, index) => {
+                let li = document.createElement("li");
+                li.innerText = `${index + 1}. ${player.name} - ${player.score} монет`;
+                list.appendChild(li);
+            });
+
+            let leaderboardBox = document.getElementById("leaderboard");
+            leaderboardBox.style.top = "10vh";
+            leaderboardBox.style.opacity = "1";
         }
 
         function hideLeaderboard() {
-            document.getElementById("leaderboard").style.top = "-100vh";
-            document.getElementById("leaderboard").style.opacity = "0";
+            let leaderboard = document.getElementById("leaderboard");
+            leaderboard.style.top = "-100vh";
+            leaderboard.style.opacity = "0";
         }
 
-        function setNickname() {
-            nickname = document.getElementById("nickname").value;
-            localStorage.setItem("nickname", nickname);
-            document.getElementById("nickname-container").style.display = "none";
-        }
-
-        if (!nickname) {
-            document.getElementById("nickname-container").style.display = "block";
+        function showError() {
+            let errorBox = document.getElementById("error");
+            errorBox.style.top = "20px";
+            setTimeout(() => {
+                errorBox.style.top = "-100vh";
+            }, 2000);
         }
     </script>
 </body>
