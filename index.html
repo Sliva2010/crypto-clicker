@@ -16,6 +16,7 @@
         }
         .container {
             margin-top: 50px;
+            display: none;
         }
         .button {
             background-color: #f39c12;
@@ -109,9 +110,62 @@
         .close-btn:hover {
             background: darkred;
         }
+        /* Регистрация */
+        .register-container {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: linear-gradient(135deg, #8e44ad, #3498db);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            box-shadow: 0px 0px 10px rgba(0,0,0,0.2);
+        }
+        .register-input {
+            padding: 10px;
+            font-size: 16px;
+            border: none;
+            border-radius: 5px;
+            width: 80%;
+            text-align: center;
+        }
+        .register-btn {
+            margin-top: 10px;
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: #27ae60;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        .register-btn:hover {
+            background-color: #219150;
+        }
+        .dice-btn {
+            background: #f39c12;
+            color: white;
+            border: none;
+            padding: 10px;
+            font-size: 18px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-left: 5px;
+        }
     </style>
 </head>
 <body>
+
+    <div class="register-container" id="register">
+        <h2>Введите ник</h2>
+        <input type="text" id="nickname" class="register-input" placeholder="Ваш ник">
+        <button class="dice-btn" onclick="generateNickname()">🎲</button>
+        <button class="register-btn" onclick="saveNickname()">Продолжить</button>
+    </div>
+
     <div class="container">
         <h1>Crypto Clicker</h1>
         <p>Баланс: <span id="balance">0</span> монет</p>
@@ -135,34 +189,30 @@
         let balance = 0;
         let clickValue = 1;
         let autoMining = false;
+        let nickname = localStorage.getItem("nickname") || "";
+
         let tg = window.Telegram.WebApp;
         tg.expand();
 
-        function mineCoin() {
-            balance += clickValue;
-            updateUI();
+        if (!nickname) {
+            document.getElementById("register").style.display = "block";
+        } else {
+            document.querySelector(".container").style.display = "block";
         }
 
-        function buyUpgrade(type, cost) {
-            if (balance >= cost) {
-                balance -= cost;
-                if (type === 1) {
-                    clickValue += 1;
-                } else if (type === 2 && !autoMining) {
-                    autoMining = true;
-                    setInterval(() => {
-                        balance += clickValue;
-                        updateUI();
-                    }, 2000);
-                }
-                updateUI();
-            } else {
-                showError("Недостаточно монет!");
+        function generateNickname() {
+            const names = ["CryptoMaster", "BTC_Hero", "BlockMiner", "HashKing", "SatoshiFan"];
+            document.getElementById("nickname").value = names[Math.floor(Math.random() * names.length)];
+        }
+
+        function saveNickname() {
+            let inputNick = document.getElementById("nickname").value.trim();
+            if (inputNick && !inputNick.includes(" ")) {
+                localStorage.setItem("nickname", inputNick);
+                nickname = inputNick;
+                document.getElementById("register").style.display = "none";
+                document.querySelector(".container").style.display = "block";
             }
-        }
-
-        function updateUI() {
-            document.getElementById("balance").innerText = balance;
         }
 
         function showLeaderboard() {
@@ -179,19 +229,8 @@
         }
 
         function loadLeaderboard() {
-            let leaderboard = [
-                {name: "Игрок1", score: 150},
-                {name: "Игрок2", score: 120},
-                {name: "Игрок3", score: 100},
-                {name: "Ты", score: balance},
-            ];
             let list = document.getElementById("leaderboard-list");
-            list.innerHTML = "";
-            leaderboard.forEach((player, index) => {
-                let li = document.createElement("li");
-                li.innerText = `${index + 1}. ${player.name} - ${player.score} монет`;
-                list.appendChild(li);
-            });
+            list.innerHTML = `<li>1. ${nickname} - ${balance} монет</li>`;
         }
     </script>
 </body>
