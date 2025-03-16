@@ -56,7 +56,7 @@
             bottom: 20px;
             background-color: #ffd700;
             color: black;
-            padding: 10px 15px;
+            padding: 10px;
             font-size: 22px;
             border-radius: 50%;
             cursor: pointer;
@@ -84,67 +84,23 @@
         .leaderboard-container h2 {
             text-align: center;
         }
-        .leaderboard-list {
-            list-style: none;
-            padding: 0;
-        }
-        .leaderboard-list li {
-            padding: 10px;
-            border-bottom: 1px solid #ddd;
-        }
-        .close-btn {
-            position: absolute;
-            top: 10px;
-            right: 10px;
+        .error-popup {
+            position: fixed;
+            top: -100vh;
+            left: 50%;
+            transform: translateX(-50%);
             background: red;
             color: white;
-            border: none;
-            border-radius: 50%;
-            width: 30px;
-            height: 30px;
-            font-size: 18px;
-            cursor: pointer;
-            transition: background 0.3s;
-        }
-        .close-btn:hover {
-            background: darkred;
-        }
-        .nickname-popup {
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background: linear-gradient(135deg, #ff9a9e, #fad0c4);
-            padding: 20px;
+            padding: 15px;
             border-radius: 10px;
-            box-shadow: 0px 0px 10px rgba(0,0,0,0.2);
-            text-align: center;
-        }
-        .nickname-popup input {
-            padding: 10px;
-            font-size: 16px;
-            margin: 10px;
-            border: none;
-            border-radius: 5px;
-        }
-        .nickname-popup button {
-            padding: 10px;
-            font-size: 16px;
-            background: #4CAF50;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
+            font-size: 18px;
+            transition: top 0.5s ease-in-out, opacity 0.5s ease-in-out;
+            opacity: 0;
         }
     </style>
 </head>
 <body>
-    <div id="nickname-popup" class="nickname-popup">
-        <h2>Введите никнейм</h2>
-        <input type="text" id="nickname-input" placeholder="Ваш ник">
-        <button onclick="generateNickname()">🎲</button>
-        <button onclick="saveNickname()">OK</button>
-    </div>
+    <div id="error-popup" class="error-popup">Недостаточно монет!</div>
 
     <div class="container">
         <h1>Crypto Clicker</h1>
@@ -159,17 +115,11 @@
     </div>
 
     <button class="leaderboard-btn" onclick="showLeaderboard()">🏆</button>
-    <div class="leaderboard-container" id="leaderboard">
-        <button class="close-btn" onclick="hideLeaderboard()">×</button>
-        <h2>Топ игроков</h2>
-        <ul class="leaderboard-list" id="leaderboard-list"></ul>
-    </div>
 
     <script>
         let balance = 0;
         let clickValue = 1;
         let autoMining = false;
-        let nickname = localStorage.getItem("nickname") || "";
 
         function mineCoin() {
             balance += clickValue;
@@ -198,52 +148,15 @@
             document.getElementById("balance").innerText = balance;
         }
 
-        function showLeaderboard() {
-            let leaderboard = document.getElementById("leaderboard");
-            leaderboard.style.top = "10vh";
-            leaderboard.style.opacity = "1";
-            loadLeaderboard();
-        }
-
-        function hideLeaderboard() {
-            let leaderboard = document.getElementById("leaderboard");
-            leaderboard.style.top = "-100vh";
-            leaderboard.style.opacity = "0";
-        }
-
-        function loadLeaderboard() {
-            let leaderboard = [
-                {name: nickname, score: balance},
-                {name: "Игрок1", score: 150},
-                {name: "Игрок2", score: 120},
-                {name: "Игрок3", score: 100}
-            ];
-            leaderboard.sort((a, b) => b.score - a.score);
-            let list = document.getElementById("leaderboard-list");
-            list.innerHTML = "";
-            leaderboard.forEach((player, index) => {
-                let li = document.createElement("li");
-                li.innerText = `${index + 1}. ${player.name} - ${player.score} монет`;
-                list.appendChild(li);
-            });
-        }
-
-        function saveNickname() {
-            let input = document.getElementById("nickname-input").value.trim();
-            if (input) {
-                nickname = input;
-                localStorage.setItem("nickname", nickname);
-                document.getElementById("nickname-popup").style.display = "none";
-            }
-        }
-
-        function generateNickname() {
-            let randomNick = "Игрок" + Math.floor(Math.random() * 10000);
-            document.getElementById("nickname-input").value = randomNick;
-        }
-
-        if (!nickname) {
-            document.getElementById("nickname-popup").style.display = "block";
+        function showError(message) {
+            let errorPopup = document.getElementById("error-popup");
+            errorPopup.innerText = message;
+            errorPopup.style.top = "10vh";
+            errorPopup.style.opacity = "1";
+            setTimeout(() => {
+                errorPopup.style.top = "-100vh";
+                errorPopup.style.opacity = "0";
+            }, 2000);
         }
     </script>
 </body>
