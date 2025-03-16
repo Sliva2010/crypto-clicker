@@ -54,6 +54,7 @@
             border-radius: 5px;
             cursor: pointer;
             transition: transform 0.1s ease, box-shadow 0.1s ease;
+            margin-bottom: 10px; /* Раздвигаем кнопки */
         }
         .shop button:active {
             transform: scale(0.95);
@@ -136,10 +137,11 @@
             }
 
             let referralLink = `https://t.me/CryptoClicker1_bot?start=${userId}`;
+
             navigator.clipboard.writeText(referralLink).then(() => {
                 tg.showPopup({ message: "Ссылка скопирована! Отправьте её другу." });
             }).catch(() => {
-                tg.showPopup({ message: "Ошибка копирования ссылки!" });
+                prompt("Ошибка копирования! Скопируйте ссылку вручную:", referralLink);
             });
         }
 
