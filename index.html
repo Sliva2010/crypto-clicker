@@ -11,8 +11,6 @@
             font-family: Arial, sans-serif;
             background: linear-gradient(135deg, #6a11cb, #2575fc);
             color: white;
-            margin: 0;
-            padding: 0;
         }
         .container {
             margin-top: 50px;
@@ -26,29 +24,38 @@
             border-radius: 10px;
             cursor: pointer;
             margin-top: 20px;
-            transition: transform 0.1s ease-in-out;
+            transition: transform 0.1s;
         }
         .button:active {
             transform: scale(0.95);
         }
-        .shop {
-            margin-top: 30px;
-        }
         .shop button {
             display: block;
-            width: 220px;
+            width: 200px;
             margin: 10px auto;
-            padding: 12px;
+            padding: 10px;
             font-size: 18px;
             background-color: #3498db;
             color: white;
             border: none;
             border-radius: 5px;
             cursor: pointer;
-            transition: transform 0.1s ease-in-out;
+            transition: transform 0.1s;
         }
         .shop button:active {
             transform: scale(0.95);
+        }
+        .notification {
+            position: fixed;
+            top: -50px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: red;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: top 0.5s ease-in-out;
         }
     </style>
 </head>
@@ -64,6 +71,7 @@
             <button onclick="buyUpgrade(2, 25)">🤖 Авто-майнинг (25 монет)</button>
         </div>
     </div>
+    <div id="notification" class="notification">Недостаточно монет!</div>
     
     <script>
         let balance = 0;
@@ -91,12 +99,21 @@
                 }
                 updateUI();
             } else {
-                alert("Недостаточно монет!");
+                showNotification("Недостаточно монет!");
             }
         }
 
         function updateUI() {
             document.getElementById("balance").innerText = balance;
+        }
+
+        function showNotification(message) {
+            let notification = document.getElementById("notification");
+            notification.innerText = message;
+            notification.style.top = "20px";
+            setTimeout(() => {
+                notification.style.top = "-50px";
+            }, 2000);
         }
     </script>
 </body>
