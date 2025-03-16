@@ -3,283 +3,264 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Space Energy Clicker</title>
+    <title>Space Clicker</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
         :root {
-            --space-blue: #0a1a2f;
-            --neon-blue: #00f3ff;
+            --bg: #0F172A;
+            --primary: #38BDF8;
+            --secondary: #4F46E5;
+            --accent: #10B981;
         }
 
         body {
             margin: 0;
-            background: radial-gradient(circle at center, 
-                #000428 0%, 
-                var(--space-blue) 100%);
-            min-height: 100vh;
+            background: var(--bg);
             color: white;
-            font-family: 'Arial', sans-serif;
-            overflow-x: hidden;
+            font-family: 'Segoe UI', system-ui;
+            min-height: 100vh;
+            display: grid;
+            grid-template-areas: 
+                "header header"
+                "main sidebar"
+                "station station";
+            grid-template-columns: 1fr 300px;
+            grid-template-rows: auto 1fr auto;
         }
 
-        /* Звёздный фон */
-        .star {
-            position: absolute;
-            background: white;
-            border-radius: 50%;
-            animation: twinkle 1.5s infinite;
+        /* Шапка */
+        .header {
+            grid-area: header;
+            padding: 1rem;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
 
-        @keyframes twinkle {
-            0%, 100% { opacity: 0.3; }
-            50% { opacity: 1; }
-        }
-
-        /* Основная кнопка */
-        .main-button {
-            position: relative;
-            width: 200px;
-            height: 200px;
-            border: none;
-            border-radius: 50%;
-            background: radial-gradient(circle, 
-                #00f3ff 0%, 
-                rgba(0, 243, 255, 0.2) 70%);
-            cursor: pointer;
-            overflow: hidden;
-            box-shadow: 0 0 50px rgba(0, 243, 255, 0.5);
-            margin: 20px auto;
+        .energy-badge {
+            background: rgba(56, 189, 248, 0.15);
+            padding: 0.5rem 1rem;
+            border-radius: 999px;
             display: flex;
             align-items: center;
-            justify-content: center;
+            gap: 0.5rem;
         }
 
-        .pulse-effect {
-            position: absolute;
-            width: 100%;
-            height: 100%;
+        /* Основная зона */
+        .main {
+            grid-area: main;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 2rem;
+            gap: 2rem;
+        }
+
+        .main-button {
+            width: 240px;
+            height: 240px;
             border-radius: 50%;
-            animation: pulse 2s infinite;
-            border: 2px solid #00f3ff;
+            background: var(--primary);
+            border: none;
+            cursor: pointer;
+            transition: transform 0.1s;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 1rem;
+            box-shadow: 0 0 40px rgba(56, 189, 248, 0.3);
         }
 
-        @keyframes pulse {
-            0% { transform: scale(0.9); opacity: 1; }
-            100% { transform: scale(1.2); opacity: 0; }
+        .main-button:active {
+            transform: scale(0.95);
         }
 
-        .button-text {
-            position: relative;
-            font-size: 1.2em;
-            text-shadow: 0 0 10px #00f3ff;
-            z-index: 1;
+        .click-effect {
+            position: absolute;
+            color: var(--primary);
+            font-size: 1.5em;
+            animation: float 1s ease-out;
+            pointer-events: none;
         }
 
         /* Боковая панель */
         .sidebar {
-            position: fixed;
-            right: 20px;
-            top: 20px;
-            background: rgba(0, 0, 0, 0.7);
-            padding: 15px;
-            border-radius: 10px;
-            border: 1px solid #00f3ff;
-            width: 250px;
+            grid-area: sidebar;
+            background: rgba(255,255,255,0.05);
+            padding: 1.5rem;
+            border-left: 1px solid rgba(255,255,255,0.1);
         }
 
         .upgrade-card {
-            background: rgba(255, 255, 255, 0.1);
-            border: 1px solid var(--neon-blue);
-            border-radius: 10px;
-            padding: 15px;
-            margin: 10px 0;
+            background: rgba(255,255,255,0.08);
+            padding: 1rem;
+            border-radius: 12px;
+            margin-bottom: 1rem;
+            transition: transform 0.2s;
             cursor: pointer;
-            transition: 0.3s;
         }
 
         .upgrade-card:hover {
-            transform: translateY(-3px);
-            background: rgba(0, 243, 255, 0.1);
+            transform: translateX(8px);
+            background: linear-gradient(90deg, 
+                rgba(56, 189, 248, 0.15), 
+                transparent);
         }
 
-        /* Прогресс-бар */
+        /* Станция */
+        .station {
+            grid-area: station;
+            padding: 2rem;
+            border-top: 1px solid rgba(255,255,255,0.1);
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .progress {
+            flex-grow: 1;
+            height: 8px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
         .progress-bar {
-            width: 100%;
-            height: 10px;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 5px;
-        }
-
-        .progress-fill {
             height: 100%;
             background: linear-gradient(90deg, 
-                var(--neon-blue), 
-                #7d00ff);
-            border-radius: 5px;
+                var(--primary), 
+                var(--secondary));
             transition: width 0.5s;
         }
 
-        /* Эффекты кликов */
-        .click-effect {
-            position: absolute;
-            color: #00f3ff;
-            font-size: 1.5em;
-            animation: floatUp 1s ease-out;
-            pointer-events: none;
-            text-shadow: 0 0 10px #00f3ff;
-        }
-
-        @keyframes floatUp {
+        @keyframes float {
             0% { transform: translateY(0); opacity: 1; }
-            100% { transform: translateY(-50px); opacity: 0; }
-        }
-
-        /* Космическая станция */
-        .station {
-            position: fixed;
-            left: 50px;
-            bottom: 50px;
-            width: 150px;
-            height: 150px;
-            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="50" r="45" fill="%230a1a2f" stroke="%2300f3ff" stroke-width="2"/></svg>');
-            animation: rotate 20s linear infinite;
-        }
-
-        @keyframes rotate {
-            from { transform: rotate(0deg); }
-            to { transform: rotate(360deg); }
+            100% { transform: translateY(-80px); opacity: 0; }
         }
     </style>
 </head>
 <body>
-    <!-- Звёздный фон -->
-    <div class="stars" id="stars"></div>
-
-    <!-- Основной интерфейс -->
-    <div style="text-align: center; padding-top: 50px;">
-        <h1>⚡ Энергия: <span id="energy">0</span></h1>
-        <div class="progress-bar">
-            <div class="progress-fill" id="station-progress" style="width: 0%"></div>
+    <header class="header">
+        <h1>🚀 Space Clicker</h1>
+        <div class="energy-badge">
+            ⚡ <span id="energy">0</span> энергии
         </div>
-        
-        <button class="main-button" id="main-btn">
-            <div class="pulse-effect"></div>
-            <span class="button-text">⚡ Собирать энергию!</span>
+    </header>
+
+    <main class="main">
+        <button class="main-button" id="clickButton">
+            <span style="font-size: 2.5em;">⚡</span>
+            <span>Кликни!</span>
+            <span style="font-size: 0.9em; opacity: 0.8;">+<span id="clickPower">1</span>/клик</span>
         </button>
-        
-        <h3>🚀 Уровень станции: <span id="level">1</span></h3>
-    </div>
+    </main>
 
-    <!-- Боковая панель -->
-    <div class="sidebar">
-        <h3>🛠️ Улучшения</h3>
-        <div id="upgrades-container"></div>
-        
-        <h3 style="margin-top: 20px;">🎯 Задачи</h3>
-        <div class="upgrade-card">
-            <h4>Новичок</h4>
-            <p>Собери 100 энергии</p>
-            <div class="progress-bar">
-                <div class="progress-fill" style="width: 0%"></div>
-            </div>
+    <aside class="sidebar">
+        <h2>🛠 Улучшения</h2>
+        <div class="upgrade-card" data-upgrade="1">
+            <h3>☀️ Солнечные панели</h3>
+            <p>+2 энергии/сек</p>
+            <div class="price">🪙 <span>50</span></div>
         </div>
-    </div>
+        
+        <div class="upgrade-card" data-upgrade="2">
+            <h3>⚡ Генератор</h3>
+            <p>+1 к силе клика</p>
+            <div class="price">🪙 <span>100</span></div>
+        </div>
+    </aside>
 
-    <!-- Космическая станция -->
-    <div class="station" id="station"></div>
+    <section class="station">
+        <div class="level">🚀 Уровень <span>1</span></div>
+        <div class="progress">
+            <div class="progress-bar" style="width: 10%"></div>
+        </div>
+    </section>
 
     <script>
         const tg = window.Telegram.WebApp;
         tg.expand();
         
-        let energy = 0;
-        let clickPower = 1;
-        let upgrades = [
-            { id: 1, name: '☀️ Солнечные панели', cost: 50, power: 2, owned: 0 },
-            { id: 2, name: '⚛️ Ядерный реактор', cost: 200, power: 10, owned: 0 },
-            { id: 3, name: '🪐 Планетарный двигатель', cost: 1000, power: 50, owned: 0 }
-        ];
+        let state = {
+            energy: 0,
+            clickPower: 1,
+            upgrades: [
+                { id: 1, name: 'Солнечные панели', cost: 50, power: 2, owned: 0 },
+                { id: 2, name: 'Генератор', cost: 100, power: 1, owned: 0 }
+            ]
+        };
 
-        // Инициализация звёзд
-        function createStars() {
-            const starsContainer = document.getElementById('stars');
-            for(let i = 0; i < 100; i++) {
-                const star = document.createElement('div');
-                star.className = 'star';
-                star.style.width = Math.random() * 3 + 'px';
-                star.style.height = star.style.width;
-                star.style.left = Math.random() * 100 + '%';
-                star.style.top = Math.random() * 100 + '%';
-                star.style.animationDelay = Math.random() * 1.5 + 's';
-                starsContainer.appendChild(star);
-            }
-        }
-
-        // Покупка улучшений
-        function buyUpgrade(id) {
-            const upgrade = upgrades.find(u => u.id === id);
-            if(energy >= upgrade.cost) {
-                energy -= upgrade.cost;
-                upgrade.owned++;
-                upgrade.cost = Math.round(upgrade.cost * 1.5);
-                updateGame();
-            }
-        }
-
-        // Автоматическая добыча
-        setInterval(() => {
-            upgrades.forEach(upgrade => {
-                energy += upgrade.owned * upgrade.power;
-            });
-            updateUI();
-        }, 1000);
-
-        // Обновление интерфейса
-        function updateUI() {
-            document.getElementById('energy').textContent = Math.floor(energy);
-            const level = Math.floor(energy / 1000) + 1;
-            document.getElementById('level').textContent = level;
-            document.getElementById('station-progress').style.width = `${(energy % 1000)/10}%`;
-            
-            // Анимация станции
-            document.getElementById('station').style.transform = 
-                `rotate(${energy % 360}deg) scale(${1 + level*0.1})`;
-        }
-
-        // Рендер улучшений
-        function updateGame() {
-            const container = document.getElementById('upgrades-container');
-            container.innerHTML = upgrades.map(upgrade => `
-                <div class="upgrade-card" onclick="buyUpgrade(${upgrade.id})">
-                    <h4>${upgrade.name}</h4>
-                    <p>⚡ +${upgrade.power}/сек</p>
-                    <p>💵 ${upgrade.cost} энергии</p>
-                    <p>✅ Куплено: ${upgrade.owned}</p>
-                </div>
-            `).join('');
-            updateUI();
-        }
-
-        // Эффект клика
-        document.getElementById('main-btn').addEventListener('click', (e) => {
-            energy += clickPower;
+        // Клик по основной кнопке
+        document.getElementById('clickButton').addEventListener('click', (e) => {
+            state.energy += state.clickPower;
             createClickEffect(e);
             updateUI();
         });
 
+        // Автокликеры
+        setInterval(() => {
+            state.upgrades.forEach(upgrade => {
+                state.energy += upgrade.owned * upgrade.power;
+            });
+            updateUI();
+        }, 1000);
+
+        // Покупка улучшений
+        document.querySelectorAll('.upgrade-card').forEach(card => {
+            card.addEventListener('click', () => {
+                const id = parseInt(card.dataset.upgrade);
+                const upgrade = state.upgrades.find(u => u.id === id);
+                
+                if(state.energy >= upgrade.cost) {
+                    state.energy -= upgrade.cost;
+                    upgrade.owned++;
+                    upgrade.cost = Math.round(upgrade.cost * 1.5);
+                    
+                    if(id === 2) state.clickPower += upgrade.power;
+                    
+                    updateUI();
+                }
+            });
+        });
+
+        // Эффекты
         function createClickEffect(e) {
             const effect = document.createElement('div');
             effect.className = 'click-effect';
-            effect.textContent = `+${clickPower}`;
+            effect.textContent = `+${state.clickPower}`;
             effect.style.left = `${e.clientX}px`;
             effect.style.top = `${e.clientY}px`;
             document.body.appendChild(effect);
             setTimeout(() => effect.remove(), 1000);
         }
 
-        // Запуск игры
-        createStars();
-        updateGame();
+        // Обновление интерфейса
+        function updateUI() {
+            // Энергия
+            document.getElementById('energy').textContent = Math.floor(state.energy);
+            
+            // Сила клика
+            document.getElementById('clickPower').textContent = state.clickPower;
+            
+            // Улучшения
+            document.querySelectorAll('.upgrade-card').forEach((card, index) => {
+                const upgrade = state.upgrades[index];
+                card.querySelector('.price span').textContent = upgrade.cost;
+                card.querySelector('p').innerHTML = upgrade.id === 1 
+                    ? `+${upgrade.power} энергии/сек` 
+                    : `+${upgrade.power} к силе клика`;
+            });
+
+            // Прогресс
+            const level = Math.floor(state.energy / 1000) + 1;
+            document.querySelector('.level span').textContent = level;
+            document.querySelector('.progress-bar').style.width = 
+                `${(state.energy % 1000)/10}%`;
+        }
+
+        updateUI();
     </script>
 </body>
 </html>
