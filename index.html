@@ -123,6 +123,13 @@
             transition: width 0.5s;
         }
 
+        .stage-info {
+            text-align: center;
+            margin-top: 0.5rem;
+            font-size: 0.9em;
+            opacity: 0.8;
+        }
+
         @keyframes float {
             0% { transform: translateY(0); opacity: 1; }
             100% { transform: translateY(-80px); opacity: 0; }
@@ -161,8 +168,9 @@
     <section class="progress">
         <h2>🚀 Прогресс</h2>
         <div class="progress-bar">
-            <div class="progress-fill" style="width: 10%"></div>
+            <div class="progress-fill" id="progressFill"></div>
         </div>
+        <div class="stage-info" id="stageInfo"></div>
         <div style="text-align: center; margin-top: 0.5rem;">
             Уровень <span id="level">1</span>
         </div>
@@ -175,11 +183,24 @@
         let state = {
             energy: 0,
             clickPower: 1,
+            level: 1,
             upgrades: [
                 { id: 1, name: 'Солнечные панели', cost: 50, power: 2, owned: 0 },
                 { id: 2, name: 'Генератор', cost: 100, power: 1, owned: 0 }
             ]
         };
+
+        // Система стадий
+        const stages = [
+            { maxLevel: 8, energyPerLevel: 100 },  // Легко
+            { maxLevel: 15, energyPerLevel: 500 }, // Средне
+            { maxLevel: Infinity, energyPerLevel: 1000 } // Сложно
+        ];
+
+        // Получение текущей стадии
+        function getCurrentStage() {
+            return stages.find(stage => state.level <= stage.maxLevel);
+        }
 
         // Клик по основной кнопке
         document.getElementById('clickButton').addEventListener('click', (e) => {
@@ -227,6 +248,10 @@
 
         // Обновление интерфейса
         function updateUI() {
+            const stage = getCurrentStage();
+            const energyNeeded = stage.energyPerLevel;
+            const progress = (state.energy % energyNeeded) / energyNeeded * 100;
+
             // Энергия
             document.getElementById('energy').textContent = Math.floor(state.energy);
             
@@ -243,10 +268,24 @@
             });
 
             // Прогресс
-            const level = Math.floor(state.energy / 1000) + 1;
-            document.getElementById('level').textContent = level;
-            document.querySelector('.progress-fill').style.width = 
-                `${(state.energy % 1000)/10}%`;
+            if (state.energy >= energyNeeded) {
+                state.level++;
+                state.energy = 0; // Сброс энергии для нового уровня
+            }
+
+            document.getElementById('level').textContent = state.level;
+            document.getElementById('progressFill').style.width = `${progress}%`;
+
+            // Информация о стадии
+            let stageText;
+            if (state.level <= 8) {
+                stageText = "🚀 Легко: быстрый прогресс!";
+            } else if (state.level <= 15) {
+                stageText = "🌌 Средне: держись крепче!";
+            } else {
+                stageText = "🌠 Сложно: настоящий вызов!";
+            }
+            document.getElementById('stageInfo').textContent = stageText;
         }
 
         updateUI();
