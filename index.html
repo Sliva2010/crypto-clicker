@@ -9,10 +9,10 @@
         body {
             text-align: center;
             font-family: Arial, sans-serif;
-            background: linear-gradient(45deg, #6a11cb, #2575fc);
+            background: linear-gradient(135deg, #6a11cb, #2575fc);
             color: white;
             margin: 0;
-            padding: 0;
+            overflow: hidden;
         }
         .container {
             margin-top: 50px;
@@ -26,11 +26,10 @@
             border-radius: 10px;
             cursor: pointer;
             margin-top: 20px;
-            transition: transform 0.1s, background 0.3s;
+            transition: transform 0.1s;
         }
         .button:active {
             transform: scale(0.95);
-            background-color: #e67e22;
         }
         .shop {
             margin-top: 30px;
@@ -46,30 +45,59 @@
             border: none;
             border-radius: 5px;
             cursor: pointer;
-            transition: transform 0.1s, background 0.3s;
+            transition: transform 0.1s;
         }
         .shop button:active {
             transform: scale(0.95);
-            background-color: #2980b9;
         }
-        /* Стили для уведомления */
-        .notification {
+        .leaderboard-btn {
             position: fixed;
-            top: -50px;
+            right: 20px;
+            top: 20px;
+            background-color: #ffd700;
+            color: black;
+            padding: 10px 15px;
+            font-size: 22px;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: transform 0.1s;
+        }
+        .leaderboard-btn:active {
+            transform: scale(0.9);
+        }
+        .leaderboard-container {
+            position: fixed;
+            top: -100vh;
             left: 50%;
             transform: translateX(-50%);
-            background: rgba(255, 0, 0, 0.9);
-            color: white;
-            padding: 15px 30px;
+            width: 80%;
+            max-width: 400px;
+            background: white;
+            color: black;
             border-radius: 10px;
-            font-size: 18px;
-            font-weight: bold;
-            transition: top 0.5s ease-in-out, opacity 0.5s;
-            opacity: 0;
+            padding: 20px;
+            box-shadow: 0px 0px 10px rgba(0,0,0,0.2);
+            text-align: left;
+            transition: top 0.5s;
         }
-        .notification.show {
-            top: 20px;
-            opacity: 1;
+        .leaderboard-container h2 {
+            text-align: center;
+        }
+        .leaderboard-list {
+            list-style: none;
+            padding: 0;
+        }
+        .leaderboard-list li {
+            padding: 10px;
+            border-bottom: 1px solid #ddd;
+        }
+        .loading-animation {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 40px;
+            display: none;
         }
     </style>
 </head>
@@ -86,8 +114,13 @@
         </div>
     </div>
 
-    <div class="notification" id="notification">Недостаточно монет!</div>
-    
+    <button class="leaderboard-btn" onclick="showLeaderboard()">🏆</button>
+    <div class="loading-animation" id="loading">🪙🪙🪙</div>
+    <div class="leaderboard-container" id="leaderboard">
+        <h2>Топ игроков</h2>
+        <ul class="leaderboard-list" id="leaderboard-list"></ul>
+    </div>
+
     <script>
         let balance = 0;
         let clickValue = 1;
@@ -114,7 +147,7 @@
                 }
                 updateUI();
             } else {
-                showNotification("Недостаточно монет!");
+                showError("Недостаточно монет!");
             }
         }
 
@@ -122,13 +155,29 @@
             document.getElementById("balance").innerText = balance;
         }
 
-        function showNotification(message) {
-            let notification = document.getElementById("notification");
-            notification.innerText = message;
-            notification.classList.add("show");
+        function showLeaderboard() {
+            document.getElementById("loading").style.display = "block";
             setTimeout(() => {
-                notification.classList.remove("show");
+                document.getElementById("loading").style.display = "none";
+                document.getElementById("leaderboard").style.top = "10vh";
+                loadLeaderboard();
             }, 2000);
+        }
+
+        function loadLeaderboard() {
+            let leaderboard = [
+                {name: "Игрок1", score: 150},
+                {name: "Игрок2", score: 120},
+                {name: "Игрок3", score: 100},
+                {name: "Ты", score: balance},
+            ];
+            let list = document.getElementById("leaderboard-list");
+            list.innerHTML = "";
+            leaderboard.forEach((player, index) => {
+                let li = document.createElement("li");
+                li.innerText = `${index + 1}. ${player.name} - ${player.score} монет`;
+                list.appendChild(li);
+            });
         }
     </script>
 </body>
