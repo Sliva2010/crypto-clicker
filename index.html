@@ -106,12 +106,12 @@
         .close-btn:hover {
             background: darkred;
         }
-        .error-message {
+        #error-message {
             position: fixed;
             top: -50px;
             left: 50%;
             transform: translateX(-50%);
-            background: rgba(255, 0, 0, 0.8);
+            background: red;
             color: white;
             padding: 10px 20px;
             border-radius: 5px;
@@ -123,24 +123,24 @@
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
+            width: 300px;
             background: linear-gradient(135deg, #6a11cb, #2575fc);
             padding: 20px;
             border-radius: 10px;
             text-align: center;
-            box-shadow: 0px 0px 10px rgba(0,0,0,0.2);
             display: none;
         }
         .nickname-container input {
             width: 80%;
             padding: 10px;
-            margin-bottom: 10px;
-            border: none;
+            margin: 10px 0;
             border-radius: 5px;
-            font-size: 16px;
+            border: none;
         }
         .nickname-container button {
-            padding: 10px 20px;
-            font-size: 16px;
+            background: #f39c12;
+            color: white;
+            padding: 10px;
             border: none;
             border-radius: 5px;
             cursor: pointer;
@@ -148,13 +148,6 @@
     </style>
 </head>
 <body>
-    <div id="nickname-container" class="nickname-container">
-        <h2>Введите ник</h2>
-        <input type="text" id="nickname-input" placeholder="Введите ник без пробелов">
-        <button onclick="generateRandomNickname()">🎲</button>
-        <button onclick="setNickname()">OK</button>
-    </div>
-
     <div class="container">
         <h1>Crypto Clicker</h1>
         <p>Баланс: <span id="balance">0</span> монет</p>
@@ -174,14 +167,19 @@
         <ul class="leaderboard-list" id="leaderboard-list"></ul>
     </div>
 
-    <div id="error-message" class="error-message">Недостаточно монет!</div>
+    <div id="error-message"></div>
+
+    <div class="nickname-container" id="nickname-container">
+        <h2>Введите ник</h2>
+        <input type="text" id="nickname" placeholder="Ваш ник" maxlength="12">
+        <button onclick="confirmNickname()">OK</button>
+    </div>
 
     <script>
         let balance = 0;
         let clickValue = 1;
         let autoMining = false;
-        let tg = window.Telegram.WebApp;
-        tg.expand();
+        let nickname = localStorage.getItem("nickname") || "";
 
         function mineCoin() {
             balance += clickValue;
@@ -210,6 +208,18 @@
             document.getElementById("balance").innerText = balance;
         }
 
+        function showError(message) {
+            let errorMessage = document.getElementById("error-message");
+            errorMessage.innerText = message;
+            errorMessage.style.top = "20px";
+            errorMessage.style.opacity = "1";
+
+            setTimeout(() => {
+                errorMessage.style.top = "-50px";
+                errorMessage.style.opacity = "0";
+            }, 2000);
+        }
+
         function showLeaderboard() {
             let leaderboard = document.getElementById("leaderboard");
             leaderboard.style.top = "10vh";
@@ -224,22 +234,21 @@
         }
 
         function loadLeaderboard() {
-            let nickname = localStorage.getItem("nickname") || "Игрок";
-            let leaderboard = [{ name: nickname, score: balance }];
             let list = document.getElementById("leaderboard-list");
-            list.innerHTML = "";
-            leaderboard.forEach((player, index) => {
-                let li = document.createElement("li");
-                li.innerText = `${index + 1}. ${player.name} - ${player.score} монет`;
-                list.appendChild(li);
-            });
+            list.innerHTML = `<li>1. ${nickname} - ${balance} монет</li>`;
         }
 
-        function setNickname() {
-            let nicknameInput = document.getElementById("nickname-input").value.trim();
-            if (!nicknameInput || nicknameInput.includes(" ")) return;
-            localStorage.setItem("nickname", nicknameInput);
-            document.getElementById("nickname-container").style.display = "none";
+        function confirmNickname() {
+            let input = document.getElementById("nickname").value.trim();
+            if (input) {
+                nickname = input;
+                localStorage.setItem("nickname", nickname);
+                document.getElementById("nickname-container").style.display = "none";
+            }
+        }
+
+        if (!nickname) {
+            document.getElementById("nickname-container").style.display = "block";
         }
     </script>
 </body>
