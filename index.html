@@ -113,6 +113,22 @@
         .close-btn:hover {
             background: darkred;
         }
+        .error-message {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0.5);
+            background: red;
+            color: white;
+            padding: 15px;
+            border-radius: 10px;
+            opacity: 0;
+            transition: opacity 0.4s ease-out, transform 0.4s ease-out;
+        }
+        .error-message.show {
+            opacity: 1;
+            transform: translate(-50%, -50%) scale(1);
+        }
     </style>
 </head>
 <body>
@@ -135,6 +151,8 @@
         <h2>Топ игроков</h2>
         <ul class="leaderboard-list" id="leaderboard-list"></ul>
     </div>
+
+    <div class="error-message" id="error-message"></div>
 
     <script>
         let balance = 0;
