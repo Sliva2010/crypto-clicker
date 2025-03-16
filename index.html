@@ -72,13 +72,14 @@
             transform: translateX(-50%);
             width: 80%;
             max-width: 400px;
-            background: white;
-            color: black;
+            background: linear-gradient(135deg, #8e44ad, #3498db);
+            color: white;
             border-radius: 10px;
             padding: 20px;
             box-shadow: 0px 0px 10px rgba(0,0,0,0.2);
             text-align: left;
-            transition: top 0.5s;
+            transition: top 0.5s ease-in-out, opacity 0.5s ease-in-out;
+            opacity: 0;
         }
         .leaderboard-container h2 {
             text-align: center;
@@ -90,14 +91,6 @@
         .leaderboard-list li {
             padding: 10px;
             border-bottom: 1px solid #ddd;
-        }
-        .loading-animation {
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            font-size: 40px;
-            display: none;
         }
     </style>
 </head>
@@ -115,7 +108,6 @@
     </div>
 
     <button class="leaderboard-btn" onclick="showLeaderboard()">🏆</button>
-    <div class="loading-animation" id="loading">🪙🪙🪙</div>
     <div class="leaderboard-container" id="leaderboard">
         <h2>Топ игроков</h2>
         <ul class="leaderboard-list" id="leaderboard-list"></ul>
@@ -156,12 +148,10 @@
         }
 
         function showLeaderboard() {
-            document.getElementById("loading").style.display = "block";
-            setTimeout(() => {
-                document.getElementById("loading").style.display = "none";
-                document.getElementById("leaderboard").style.top = "10vh";
-                loadLeaderboard();
-            }, 2000);
+            let leaderboard = document.getElementById("leaderboard");
+            leaderboard.style.top = "10vh";
+            leaderboard.style.opacity = "1";
+            loadLeaderboard();
         }
 
         function loadLeaderboard() {
