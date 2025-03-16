@@ -32,25 +32,6 @@
         .button:active {
             transform: scale(0.95);
         }
-        .shop {
-            margin-top: 30px;
-        }
-        .shop button {
-            display: block;
-            width: 200px;
-            margin: 10px auto;
-            padding: 10px;
-            font-size: 18px;
-            background-color: #3498db;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: transform 0.1s;
-        }
-        .shop button:active {
-            transform: scale(0.95);
-        }
         .leaderboard-btn {
             position: fixed;
             right: 15px;
@@ -77,21 +58,12 @@
             color: white;
             border-radius: 10px;
             padding: 20px;
-            box-shadow: 0px 0px 10px rgba(0,0,0,0.2);
             text-align: left;
             transition: top 0.5s ease-in-out, opacity 0.5s ease-in-out;
             opacity: 0;
         }
         .leaderboard-container h2 {
             text-align: center;
-        }
-        .leaderboard-list {
-            list-style: none;
-            padding: 0;
-        }
-        .leaderboard-list li {
-            padding: 10px;
-            border-bottom: 1px solid #ddd;
         }
         .close-btn {
             position: absolute;
@@ -145,16 +117,6 @@
         .register-btn:hover {
             background-color: #219150;
         }
-        .dice-btn {
-            background: #f39c12;
-            color: white;
-            border: none;
-            padding: 10px;
-            font-size: 18px;
-            border-radius: 5px;
-            cursor: pointer;
-            margin-left: 5px;
-        }
     </style>
 </head>
 <body>
@@ -162,7 +124,6 @@
     <div class="register-container" id="register">
         <h2>Введите ник</h2>
         <input type="text" id="nickname" class="register-input" placeholder="Ваш ник">
-        <button class="dice-btn" onclick="generateNickname()">🎲</button>
         <button class="register-btn" onclick="saveNickname()">Продолжить</button>
     </div>
 
@@ -170,12 +131,6 @@
         <h1>Crypto Clicker</h1>
         <p>Баланс: <span id="balance">0</span> монет</p>
         <button class="button" onclick="mineCoin()">💰 Добыть монету</button>
-        
-        <div class="shop">
-            <h2>Магазин улучшений</h2>
-            <button onclick="buyUpgrade(1, 10)">⚡ Ускорение (10 монет)</button>
-            <button onclick="buyUpgrade(2, 25)">🤖 Авто-майнинг (25 монет)</button>
-        </div>
     </div>
 
     <button class="leaderboard-btn" onclick="showLeaderboard()">🏆</button>
@@ -187,23 +142,13 @@
 
     <script>
         let balance = parseInt(localStorage.getItem("balance")) || 0;
-        let clickValue = 1;
-        let autoMining = false;
         let nickname = localStorage.getItem("nickname") || "";
-
-        let tg = window.Telegram.WebApp;
-        tg.expand();
 
         if (!nickname) {
             document.getElementById("register").style.display = "block";
         } else {
             document.querySelector(".container").style.display = "block";
             updateUI();
-        }
-
-        function generateNickname() {
-            const names = ["CryptoMaster", "BTC_Hero", "BlockMiner", "HashKing", "SatoshiFan"];
-            document.getElementById("nickname").value = names[Math.floor(Math.random() * names.length)];
         }
 
         function saveNickname() {
@@ -218,7 +163,7 @@
         }
 
         function mineCoin() {
-            balance += clickValue;
+            balance++;
             localStorage.setItem("balance", balance);
             updateUI();
         }
